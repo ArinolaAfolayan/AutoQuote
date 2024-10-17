@@ -5,3 +5,4 @@ pandas
 datasets
 langchain-openai
 faiss-cpu
+flask
