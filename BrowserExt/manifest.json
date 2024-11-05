@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Pop Culture Quote Generator",
+  "version": "1.0",
+  "description": "Generates pop culture quotes based on selected text.",
+  "permissions": ["contextMenus", "activeTab", "scripting"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "quotation.png",
+      "48": "quotation.png",
+      "128": "quotation.png"
+    }
+  },
+  "icons": {
+    "16": "quotation.png",
+    "48": "quotation.png",
+    "128": "quotation.png"
+  }
+}
