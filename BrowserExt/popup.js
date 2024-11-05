@@ -17,12 +17,11 @@ document.getElementById('generateQuoteButton').addEventListener('click', async (
             if (selectedText) {
                 try {
                     // Call the Flask backend to get the quote
-                    const response = await fetch('http://localhost:5000/data', {
-                        method: 'POST',
+                    const response = await fetch('http://localhost:5000/data/' + selectedText, {
+                        method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ userInput: selectedText }),
                     });
 
                     console.log('Response status:', response.status); // Log response status
