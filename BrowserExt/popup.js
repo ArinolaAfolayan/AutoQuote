@@ -1,5 +1,3 @@
-// popup.js
-
 document.getElementById('generateQuoteButton').addEventListener('click', async () => {
     console.log('Generate Quote button clicked'); // Log when button is clicked
 
@@ -16,7 +14,7 @@ document.getElementById('generateQuoteButton').addEventListener('click', async (
 
             if (selectedText) {
                 try {
-                    // Call the Flask backend to get the quote
+                    // Call the Flask backend to get the quote and GIF URL
                     const response = await fetch('http://localhost:5000/data/' + selectedText, {
                         method: 'GET',
                         headers: {
@@ -31,7 +29,32 @@ document.getElementById('generateQuoteButton').addEventListener('click', async (
                         console.log('Received quote:', data.Output); // Log received quote
                         document.getElementById('quoteText').innerText = data.Output;
                         document.getElementById('quoteContainer').style.display = 'block';
-                        document.getElementById('quoteGIF').src = data.gif_url
+                        const gifElement = document.createElement('img');
+                        gifElement.src = data.gif_url;
+                        gifElement.id = 'quoteGIF';
+                        document.getElementById('quoteContainer').appendChild(gifElement);
+
+                        // Add copy GIF button
+                        const copyGIFButton = document.createElement('button');
+                        copyGIFButton.innerText = 'Copy GIF';
+                        copyGIFButton.className = 'copy-button';
+                        copyGIFButton.id = 'copyGIFButton';
+                        document.getElementById('quoteContainer').appendChild(copyGIFButton);
+
+                        // Add event listener for copying GIF
+                        document.getElementById('copyGIFButton').addEventListener('click', async () => {
+                            try {
+                                const response = await fetch(data.gif_url);
+                                const blob = await response.blob();
+                                const clipboardItem = new ClipboardItem({ 'image/gif': blob });
+                                await navigator.clipboard.write([clipboardItem]);
+                                alert('GIF copied to clipboard!');
+                            } catch (err) {
+                                console.error('Could not copy GIF: ', err);
+                                alert('Failed to copy GIF.');
+                            }
+                        });
+
                     } else {
                         alert('Error generating quote. Please try again.');
                     }
@@ -66,6 +89,7 @@ document.getElementById('copyQuoteButton').addEventListener('click', () => {
         alert('No quote to copy!');
     }
 });
+
 
 
 
