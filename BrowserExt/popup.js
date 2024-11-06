@@ -31,6 +31,7 @@ document.getElementById('generateQuoteButton').addEventListener('click', async (
                         console.log('Received quote:', data.Output); // Log received quote
                         document.getElementById('quoteText').innerText = data.Output;
                         document.getElementById('quoteContainer').style.display = 'block';
+                        document.getElementById('quoteGIF').src = data.gif_url
                     } else {
                         alert('Error generating quote. Please try again.');
                     }

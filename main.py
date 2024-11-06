@@ -7,6 +7,9 @@ from langchain_openai import OpenAI
 from flask import Flask
 from flask_cors import CORS
 
+# import giphy call fxn
+from giphy_fxn import giphy_call
+
 app = Flask(__name__)
 CORS(app, origins=["*"])
 
@@ -56,8 +59,13 @@ def get_quote(userInput):
     print(prompt)
 
     result = llm.invoke(prompt)
+
+    keyword = llm.invoke(f'Find the best one keyword of this that can be used to search GIPHY: {result}')
     
-    return {'Output': result}
+    return {
+        'Output': result,
+        'gif_url': giphy_call(keyword)
+        }
     
 if __name__ == "__main__":
     app.run(debug=True)
