@@ -39,7 +39,7 @@ if os.path.exists(index_path):
 else:
     # Create a FAISS vector store
     print("Creating Vector Store")
-    vector_store = FAISS.from_texts(newTexts[:1000], OpenAIEmbeddings(), metadatas=indices[:1000])
+    vector_store = FAISS.from_texts(newTexts[:60000], OpenAIEmbeddings(), metadatas=indices[:60000])
     # Save the new FAISS index locally
     vector_store.save_local(index_path)
     print("Created and saved new FAISS index")
@@ -51,10 +51,10 @@ llm = OpenAI()  # Set any necessary parameters here
 def get_quote(userInput):
     quotes = vector_store.similarity_search(userInput, k=5)
 
-    prompt = f"Out of all of the quotes below, return the one most similar to the quote '{userInput}': "
+    prompt = f"Out of all of the quotes below, return the one that could be used in place of the quote '{userInput}'. You should only respond with the quote you select. Do not include anything else.\n\n"
     for quote in quotes:
         print(quote.metadata)
-        prompt += "\n - " + quote.page_content + ' - ' + authors[int(quote.metadata['id'])]
+        prompt += "\n ### " + quote.page_content + ' - ' + authors[int(quote.metadata['id'])]
     
     print(prompt)
 
