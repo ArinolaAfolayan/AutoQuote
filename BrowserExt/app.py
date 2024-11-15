@@ -6,13 +6,20 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 from langchain_openai import OpenAI
+import kagglehub
 
+
+
+#print("Path to dataset files:", path)
 # Initialize the Flask app
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app)  # Enable  routes
 
+# Download latest version
+path = kagglehub.dataset_download("manann/quotes-500k")
+print(path)
 # Load the dataset
-df = pd.read_csv('parent_reply.csv')
+df = pd.read_csv(os.path.join(path, 'quotes.csv'))
 
 index_path = "faiss_index"
 
