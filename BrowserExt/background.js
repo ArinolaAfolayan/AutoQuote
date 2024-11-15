@@ -1,7 +1,7 @@
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "getQuote",
-    title: "Generate Pop Culture Quote",
+    title: "Spice Up Your Messages",
     contexts: ["selection"]
   });
 });

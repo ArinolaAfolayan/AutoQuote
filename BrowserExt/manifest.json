@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Pop Culture Quote Generator",
+  "name": "Auto Quote",
   "version": "1.0",
-  "description": "Generates pop culture quotes based on selected text.",
+  "description": "Provides pop culture quotes and GIFs based on selected text.",
   "permissions": ["contextMenus", "activeTab", "scripting"],
   "background": {
     "service_worker": "background.js"
