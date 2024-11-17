@@ -11,19 +11,28 @@ from flask_cors import CORS
 from giphy_fxn import giphy_call
 
 app = Flask(__name__)
-CORS(app, origins=["*"])
+CORS(app)
 
 if not os.getenv("OPENAI_API_KEY"):
     os.environ["OPENAI_API_KEY"] = "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"
 
 # Load the dataset
-df = pd.read_csv('C:/Users/aiden/Source/Repos/AutoQuote/quotes.csv')
+df = pd.read_csv('./quotes.csv')
 
 texts = df['quote'].to_list()
 authors = df['author'].to_list()
 newTexts = []
 indices = []
 newAuthors = []
+for i in range(len(texts)):
+    indices.append({'id': str(i)})
+    newTexts.append(str(texts[i]))
+    newAuthors.append(str(authors[i]))
+    texts = df['quote'].to_list()
+    authors = df['author'].to_list()
+    newTexts = []
+    indices = []
+    newAuthors = []
 for i in range(len(texts)):
     indices.append({'id': str(i)})
     newTexts.append(str(texts[i]))
@@ -57,11 +66,6 @@ def get_quote(userInput):
         print(quote.metadata)
         prompt += "\n" + quote.page_content + ' - ' + authors[int(quote.metadata['id'])]
     
-    # prompt = f"Out of all the quotes below, select the most relevant one for the input '{userInput}'. Respond with the quote only. Do not add anything else.\n\n"
-    # for quote in quotes:
-    #     prompt += f"- {quote.page_content} - {authors[int(quote.metadata['id'])]}\n"
-
-
     print(prompt)
 
     result = llm.invoke(prompt)

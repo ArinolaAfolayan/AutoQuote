@@ -28,11 +28,11 @@ for i in range(len(texts)):
     indices.append({'id': str(i)})
     newTexts.append(str(texts[i]))
     newAuthors.append(str(authors[i]))
-texts = df['quote'].to_list()
-authors = df['author'].to_list()
-newTexts = []
-indices = []
-newAuthors = []
+    texts = df['quote'].to_list()
+    authors = df['author'].to_list()
+    newTexts = []
+    indices = []
+    newAuthors = []
 for i in range(len(texts)):
     indices.append({'id': str(i)})
     newTexts.append(str(texts[i]))
@@ -64,7 +64,7 @@ def get_quote(userInput):
     prompt = f"Out of all of the quotes below, return the one that could be used in place of the quote '{userInput}'. You should only respond with the quote you select. Do not include anything else.\n\n"
     for quote in quotes:
         print(quote.metadata)
-        prompt += "\n ### " + quote.page_content + ' - ' + authors[int(quote.metadata['id'])]
+        prompt += "\n" + quote.page_content + ' - ' + authors[int(quote.metadata['id'])]
     
     print(prompt)
 
