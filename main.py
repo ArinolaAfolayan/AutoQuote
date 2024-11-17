@@ -34,12 +34,13 @@ index_path = "faiss_index"
 # Check if the FAISS index exists locally
 if os.path.exists(index_path):
     # Load the existing FAISS index
-    vector_store = FAISS.load_local(index_path, OpenAIEmbeddings())
+    vector_store = FAISS.load_local(index_path, OpenAIEmbeddings(), allow_dangerous_deserialization=True)
+
     print("Loaded existing FAISS index")
 else:
     # Create a FAISS vector store
     print("Creating Vector Store")
-    vector_store = FAISS.from_texts(newTexts[:60000], OpenAIEmbeddings(), metadatas=indices[:60000])
+    vector_store = FAISS.from_texts(newTexts[:1000], OpenAIEmbeddings(), metadatas=indices[:1000])
     # Save the new FAISS index locally
     vector_store.save_local(index_path)
     print("Created and saved new FAISS index")
@@ -54,8 +55,13 @@ def get_quote(userInput):
     prompt = f"Out of all of the quotes below, return the one that could be used in place of the quote '{userInput}'. You should only respond with the quote you select. Do not include anything else.\n\n"
     for quote in quotes:
         print(quote.metadata)
-        prompt += "\n ### " + quote.page_content + ' - ' + authors[int(quote.metadata['id'])]
+        prompt += "\n" + quote.page_content + ' - ' + authors[int(quote.metadata['id'])]
     
+    # prompt = f"Out of all the quotes below, select the most relevant one for the input '{userInput}'. Respond with the quote only. Do not add anything else.\n\n"
+    # for quote in quotes:
+    #     prompt += f"- {quote.page_content} - {authors[int(quote.metadata['id'])]}\n"
+
+
     print(prompt)
 
     result = llm.invoke(prompt)
@@ -68,4 +74,4 @@ def get_quote(userInput):
         }
     
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port=8000, debug=True)
