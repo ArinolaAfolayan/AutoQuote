@@ -6,27 +6,22 @@ from langchain.chains import RetrievalQA
 from langchain_openai import OpenAI
 from flask import Flask
 from flask_cors import CORS
+
+# import giphy call fxn
 from giphy_fxn import giphy_call
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["*"])
 
 # Ensure the OpenAI API key is set
 if not os.getenv("OPENAI_API_KEY"):
     os.environ["OPENAI_API_KEY"] = "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"
 
+
 # Load the dataset and validate the CSV file exists
 if not os.path.exists('./quotes.csv'):
     raise FileNotFoundError("The file quotes.csv does not exist.")
 
-df = pd.read_csv('./quotes.csv')
-
-import os
-import pandas as pd
-from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import FAISS
-
-# Load the dataset
 df = pd.read_csv('./quotes.csv')
 
 texts = df['quote'].to_list()
@@ -42,7 +37,6 @@ for i in range(len(texts)):
 
 index_path = "faiss_index"
 
-index_path = "faiss_index"
 
 # Check if the FAISS index exists locally
 if os.path.exists(index_path):
@@ -101,7 +95,6 @@ def get_quote(userInput):
         'Output': result,
         'gif_url': giphy_call(keyword)
     }
-
 if __name__ == "__main__":
     # Run the Flask app
     app.run(port=8000, debug=True)  # Changed port to 8000 to avoid possible conflicts
