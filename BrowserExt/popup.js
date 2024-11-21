@@ -1,73 +1,65 @@
 document.getElementById('generateQuoteButton').addEventListener('click', async () => {
-    console.log('Generate Quote button clicked'); // Log when button is clicked
+    const generateButton = document.getElementById('generateQuoteButton');
+    const quoteContainer = document.getElementById('quoteContainer');
+    const quoteTextElement = document.getElementById('quoteText');
+    const gifElement = document.getElementById('quoteGIF');
+    const copyQuoteButton = document.getElementById('copyQuoteButton');
 
-    // Get the selected text
+    // Clear the previous result immediately
+    quoteTextElement.innerText = '';
+    gifElement.src = '';
+    quoteContainer.style.display = 'none';
+
+    // Update button text to indicate loading state
+    generateButton.innerText = 'Loading...';
+
+    // Get selected text from the active tab
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     chrome.scripting.executeScript(
         {
             target: { tabId: tab.id },
-            function: getSelectedText,
+            function: () => window.getSelection().toString(),
         },
-        async (injectionResults) => {
-            const selectedText = injectionResults[0].result;
-            console.log('Selected text:', selectedText); // Log selected text
+        async (results) => {
+            const selectedText = results[0]?.result;
+            if (!selectedText) {
+                console.error('No text selected.');
+                generateButton.innerText = 'Get Quote & GIF'; // Reset button text
+                return;
+            }
 
-            if (selectedText) {
-                try {
-                    // Call the Flask backend to get the quote and GIF URL
-                    const response = await fetch('http://localhost:5000/data/' + selectedText, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    });
+            try {
+                // Fetch quote and GIF from backend
+                const response = await fetch(`http://localhost:8000/data/${selectedText}`);
+                if (!response.ok) throw new Error('Error fetching quote data');
 
-                    console.log('Response status:', response.status); // Log response status
+                const data = await response.json();
 
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log('Received quote:', data.Output); // Log received quote
-                        document.getElementById('quoteText').innerText = data.Output;
-                        document.getElementById('quoteContainer').style.display = 'block';
-                        const gifElement = document.createElement('img');
-                        gifElement.src = data.gif_url;
-                        gifElement.id = 'quoteGIF';
-                        document.getElementById('quoteContainer').appendChild(gifElement);
+                // Update quote and GIF
+                quoteTextElement.innerText = data.Output;
+                gifElement.src = data.gif_url;
+                quoteContainer.style.display = 'block';
 
-                        // Add copy GIF button
-                        const copyGIFButton = document.createElement('button');
-                        copyGIFButton.innerText = 'Copy GIF';
-                        copyGIFButton.className = 'copy-button';
-                        copyGIFButton.id = 'copyGIFButton';
-                        document.getElementById('quoteContainer').appendChild(copyGIFButton);
+                // Add copy functionality for quote only
+                copyQuoteButton.onclick = () => {
+                    navigator.clipboard.writeText(data.Output).catch((err) => console.error('Error copying quote:', err));
+                };
 
-                        // Add event listener for copying GIF
-                        document.getElementById('copyGIFButton').addEventListener('click', async () => {
-                            try {
-                                const response = await fetch(data.gif_url);
-                                const blob = await response.blob();
-                                const clipboardItem = new ClipboardItem({ 'image/gif': blob });
-                                await navigator.clipboard.write([clipboardItem]);
-                                alert('GIF copied to clipboard!');
-                            } catch (err) {
-                                console.error('Could not copy GIF: ', err);
-                                alert('Failed to copy GIF.');
-                            }
-                        });
+                // Update button text to allow fetching a new result
+                generateButton.innerText = 'Get New Quote & GIF';
 
-                    } else {
-                        alert('Error generating quote. Please try again.');
-                    }
-                } catch (error) {
-                    console.error('Error fetching quote:', error);
-                    alert('An error occurred while generating the quote. Please try again.');
-                }
-            } else {
-                alert('Please highlight some text first.');
+            } catch (error) {
+                console.error('Error processing request:', error);
+                quoteTextElement.innerText = 'Failed to fetch quote. Please try again.';
+                quoteContainer.style.display = 'block';
+                generateButton.innerText = 'Get Quote & GIF'; // Reset button text
             }
         }
     );
 });
+
+
+
 
 // Function to retrieve the selected text on the webpage
 function getSelectedText() {
