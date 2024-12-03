@@ -1,0 +1,34 @@
+# Ignore virtual environments
+venv/
+.env/
+env/
+
+# Ignore Python package files
+*.pyc
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+__pycache__/
+*.sqlite3
+
+# Ignore Node.js modules and lock files
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignore Python dependency management files
+pip-wheel-metadata/
+pip-log.txt
+
+# Ignore Python installation caches
+*.whl
+*.log
+*.cache/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
