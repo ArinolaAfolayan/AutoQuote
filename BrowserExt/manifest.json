@@ -3,7 +3,7 @@
   "name": "Auto Quote",
   "version": "1.0",
   "description": "Provides pop culture quotes and GIFs based on selected text.",
-  "permissions": ["contextMenus", "activeTab", "scripting", "clipboardWrite"],
+  "permissions": ["storage", "contextMenus", "activeTab", "scripting", "clipboardWrite"],
   "host_permissions": ["http://localhost:8000/*"],
   "background": {
     "service_worker": "background.js"
