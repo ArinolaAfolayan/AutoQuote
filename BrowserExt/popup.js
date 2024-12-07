@@ -23,6 +23,7 @@ document.getElementById('generateQuoteButton').addEventListener('click', async (
         async (results) => {
             const selectedText = results[0]?.result;
             if (!selectedText) {
+                alert('Please select some text on the page or navigate to supported webpage.');
                 console.error('No text selected.');
                 generateButton.innerText = 'Get Quote & GIF'; // Reset button text
                 return;
