@@ -1,3 +1,8 @@
+// Declaring global variables, to be used in the copy quote fxn
+// Give em a default value
+let g_fontSize = '16px';
+let g_fontType = 'Arial';
+
 document.getElementById('generateQuoteButton').addEventListener('click', async () => {
     const generateButton = document.getElementById('generateQuoteButton');
     const quoteContainer = document.getElementById('quoteContainer');
@@ -18,15 +23,43 @@ document.getElementById('generateQuoteButton').addEventListener('click', async (
     chrome.scripting.executeScript(
         {
             target: { tabId: tab.id },
-            function: () => window.getSelection().toString(),
+            function: () => {
+                // Retrieving element where text is selected: https://stackoverflow.com/questions/1335252/how-can-i-get-the-dom-element-which-contains-the-current-selection/1335347
+                // Example of using window.getComputedStyle(element): https://www.w3schools.com/jsref/jsref_getcomputedstyle.asp
+
+                const selectedText = window.getSelection().toString();
+                
+                const textElement = window.getSelection().getRangeAt(0).startContainer.parentNode;
+                const styleElement = window.getComputedStyle(textElement);
+                
+                
+                const fontType = styleElement.getPropertyValue("font-family");
+                const fontSize = styleElement.getPropertyValue("font-size");
+                window.getSelection().removeAllRanges();
+
+                return {
+                    selectedText,
+                    fontType,
+                    fontSize  
+                };
+            },
         },
         async (results) => {
-            const selectedText = results[0]?.result;
+            console.log(results);
+            // console.log(results[0]?.result);
+            const { fontSize, fontType, selectedText } = results[0]?.result;
+            // console.log(selectedText);
+            // console.log(fontSize);
+            // console.log(fontType);
             if (!selectedText) {
                 console.error('No text selected.');
                 generateButton.innerText = 'Get Quote & GIF'; // Reset button text
                 return;
             }
+
+            // Set font size and font type
+            g_fontSize = fontSize;
+            g_fontType = fontType;
 
             try {
                 // Fetch quote and GIF from backend
@@ -67,12 +100,29 @@ function getSelectedText() {
 }
 
 // Copy quote to clipboard
+// Source -- Copy rich text: https://stackoverflow.com/questions/74838274/copy-html-rich-text-using-js-navigator-clipboard
 document.getElementById('copyQuoteButton').addEventListener('click', () => {
-    const quoteText = document.getElementById('quoteText').innerText;
+    const quoteText = document.getElementById('quoteText').innerText.trim();
+    const content = `<span style="font-size: ${g_fontSize}; font-family: ${g_fontType}">${quoteText}</span>`
+    const blobHtml = new Blob([content], { type: "text/html" });
+    const blobText = new Blob([quoteText], { type: "text/plain" });
+    const data = [new ClipboardItem({
+        ["text/plain"]: blobText,
+        ["text/html"]: blobHtml,
+    })];
+
     if (quoteText && quoteText !== "Your quote will appear here...") {
-        navigator.clipboard.writeText(quoteText)
+        navigator.clipboard.write(data)
             .then(() => {
-                alert('Quote copied to clipboard!');
+                // alert('Quote copied to clipboard!');
+                const buttonElement = document.getElementById('copyQuoteButton');
+                const buttonText = buttonElement.innerHTML;
+                buttonElement.innerHTML = 'Copied &#x2714;';
+
+                // Revert button text after some time
+                setTimeout(() => {
+                    buttonElement.innerHTML = buttonText;
+                }, 1500);
             })
             .catch(err => {
                 console.error('Could not copy text: ', err);
