@@ -144,13 +144,14 @@ testTexts = [
 testIndices = []
 for i in range(len(testTexts)):
     testIndices.append({'id': str(i)})
-    
+
+"""
 meanings = []
 for text in testTexts:
     response = client.chat.completions.create(
         messages=[
             {"role": "system", "content": 
-                f"""
+                f""
                     You are an expert in determining the meaning of a phrase. You will be given a single phrase, and you must return the meaning of the phrase in a single sentence.
                     
                     Simply respond with the meaning of the phrase. Do not include anything else.
@@ -166,7 +167,7 @@ for text in testTexts:
                     
                     input: kill two birds with one stone, output: to accomplish two things with one action
               
-                """},
+                ""},
             {"role": "user", "content": text}
         ],
         model="gpt-4o",
@@ -174,7 +175,7 @@ for text in testTexts:
 
     meaning = response.choices[0].message.content
     meanings.append(meaning)
-
+"""
 
 # Check if the FAISS index exists locally
 if os.path.exists(index_path):
@@ -200,7 +201,37 @@ else:
 @app.route('/data/<userInput>')
 def get_quote(userInput):
     print(f"Received user input: {userInput}")
-    meanings = vector_store.similarity_search(userInput, k=3)
+    
+    response = client.chat.completions.create(
+        messages=[
+            {"role": "system", "content": 
+                f"""
+                    You are an expert in determining the meaning of a phrase. You will be given a single phrase, and you must return the meaning of the phrase in a single sentence.
+                    
+                    Simply respond with the meaning of the phrase. Do not include anything else.
+                    
+                    Use common language when expressing the meaning of the phrase.
+                    
+                    
+                    Below are some examples of inputs you will receive and the output you should return:
+                    
+                    input: it's a piece of cake, output: something is easy
+                    
+                    input: it's raining cats and dogs, output: it's raining heavily
+                    
+                    input: kill two birds with one stone, output: to accomplish two things with one action
+              
+                """},
+            {"role": "user", "content": userInput}
+        ],
+        model="gpt-4o",
+    )
+
+    userMeaning = response.choices[0].message.content
+    print(userMeaning)
+    
+    meanings = vector_store.similarity_search(userMeaning, k=5)
+    print(meanings)
 
     i = int(meanings[0].metadata['id'])
     
