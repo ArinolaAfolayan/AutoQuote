@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Generator</title>
+    <link rel="stylesheet" href="popup.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin: 10px 5px;
+            border: none;
+            background-color: #7629e3;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #9677d0;
+        }
+
+        .quote-container {
+            display: none; /* Hidden initially */
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        #quoteText {
+            font-size: 14px;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        #quoteGIF {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        #popupContainer {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 1000;
+        }
+
+        #closePopupButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 16px;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AutoQuote</h1>
+        <p>Select text on the page, then click the button below:</p>
+        <button id="generateQuoteButton">Get Quote & GIF</button>
+        <div id="quoteContainer" class="quote-container">
+            <p id="quoteText"></p>
+            <img id="quoteGIF" alt="Quote GIF">
+            <div id="actionContainer" style="text-align: center; margin-top: 20px;">
+                <button id="copyQuoteButton" style="padding: 10px 20px; font-size: 12px;">Copy Quote</button>
+                <p style="margin-top: 10px; font-size: 14px; color: gray;">Select and drag to paste</p>
+            </div>    
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
