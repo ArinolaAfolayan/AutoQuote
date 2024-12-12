@@ -1,8 +1,0 @@
-langchain
-langchain-community
-openai
-pandas
-datasets
-langchain-openai
-faiss-cpu
-flask
