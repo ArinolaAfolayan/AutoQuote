@@ -6,3 +6,4 @@ datasets
 langchain-openai
 faiss-cpu
 flask
+flask_cors

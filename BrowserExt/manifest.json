@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Auto Quote",
+  "version": "1.0",
+  "description": "Provides pop culture quotes and GIFs based on selected text.",
+  "permissions": ["storage", "contextMenus", "activeTab", "scripting", "clipboardWrite"],
+  "host_permissions": ["http://localhost:8000/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "quotation.png",
+      "48": "quotation.png",
+      "128": "quotation.png"
+    }
+  },
+  "icons": {
+    "16": "quotation.png",
+    "48": "quotation.png",
+    "128": "quotation.png"
+  }
+}
