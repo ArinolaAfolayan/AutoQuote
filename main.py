@@ -145,7 +145,7 @@ testIndices = []
 for i in range(len(testTexts)):
     testIndices.append({'id': str(i)})
 
-"""
+
 meanings = []
 for text in testTexts:
     response = client.chat.completions.create(
@@ -175,7 +175,7 @@ for text in testTexts:
 
     meaning = response.choices[0].message.content
     meanings.append(meaning)
-"""
+
 
 # Check if the FAISS index exists locally
 if os.path.exists(index_path):
