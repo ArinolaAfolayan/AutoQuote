@@ -6,18 +6,12 @@ from langchain.chains import RetrievalQA
 from openai import OpenAI
 from flask import Flask
 from flask_cors import CORS
-
-# import giphy call fxn
 from giphy_fxn import giphy_call
-
-app = Flask(__name__)
-CORS(app, origins=["*"])
 
 # Ensure the OpenAI API key is set
 if not os.getenv("OPENAI_API_KEY"):
     os.environ["OPENAI_API_KEY"] = "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"
-    
-client = OpenAI()
+
 
 # Load the dataset and validate the CSV file exists
 if not os.path.exists('./quotes.csv'):
@@ -36,7 +30,8 @@ for i in range(len(texts)):
     newTexts.append(str(texts[i]))
     newAuthors.append(str(authors[i]))
 
-index_path = "faiss_index"
+client = OpenAI()
+
 
 testTexts = [
     "A picture is worth a thousand words",
@@ -141,67 +136,10 @@ testTexts = [
     "It's raining cats and dogs"
 ]
 
-testIndices = []
-for i in range(len(testTexts)):
-    testIndices.append({'id': str(i)})
 
-"""
 meanings = []
+
 for text in testTexts:
-    response = client.chat.completions.create(
-        messages=[
-            {"role": "system", "content": 
-                f""
-                    You are an expert in determining the meaning of a phrase. You will be given a single phrase, and you must return the meaning of the phrase in a single sentence.
-                    
-                    Simply respond with the meaning of the phrase. Do not include anything else.
-                    
-                    Use common language when expressing the meaning of the phrase.
-                    
-                    
-                    Below are some examples of inputs you will receive and the output you should return:
-                    
-                    input: it's a piece of cake, output: something is easy
-                    
-                    input: it's raining cats and dogs, output: it's raining heavily
-                    
-                    input: kill two birds with one stone, output: to accomplish two things with one action
-              
-                ""},
-            {"role": "user", "content": text}
-        ],
-        model="gpt-4o",
-    )
-
-    meaning = response.choices[0].message.content
-    meanings.append(meaning)
-"""
-
-# Check if the FAISS index exists locally
-if os.path.exists(index_path):
-    print("Loading existing FAISS index...")
-    try:
-        vector_store = FAISS.load_local(index_path, OpenAIEmbeddings())
-        print("Loaded existing FAISS index.")
-    except Exception as e:
-        print(f"Error loading FAISS index: {e}")
-        print("Attempting to recreate the index.")
-        os.makedirs(index_path, exist_ok=True)  # Ensure the directory exists
-        vector_store = FAISS.from_texts(meanings, OpenAIEmbeddings(), metadatas=testIndices)
-        vector_store.save_local(index_path)
-        print("Created and saved new FAISS index.")
-else:
-    print("FAISS index not found. Creating new index...")
-    os.makedirs(index_path, exist_ok=True)
-    vector_store = FAISS.from_texts(meanings, OpenAIEmbeddings(), metadatas=testIndices)
-    vector_store.save_local(index_path)
-    print("Created and saved new FAISS index.")
-
-
-@app.route('/data/<userInput>')
-def get_quote(userInput):
-    print(f"Received user input: {userInput}")
-    
     response = client.chat.completions.create(
         messages=[
             {"role": "system", "content": 
@@ -222,42 +160,28 @@ def get_quote(userInput):
                     input: kill two birds with one stone, output: to accomplish two things with one action
               
                 """},
-            {"role": "user", "content": userInput}
+            {"role": "user", "content": text}
         ],
         model="gpt-4o",
     )
 
-    userMeaning = response.choices[0].message.content
-    print(userMeaning)
+    meaning = response.choices[0].message.content
+    meanings.append(meaning)
     
-    meanings = vector_store.similarity_search(userMeaning, k=5)
-    print(meanings)
+testIndices = []
+for i in range(len(testTexts)):
+    print(testTexts[i])
+    print(meanings[i])
+    print()
+    testIndices.append({'id': str(i)})
 
-    i = int(meanings[0].metadata['id'])
-    
-    print("Response")
-    matchedQuote = testTexts[i]
-    print(matchedQuote)
-    
 
-    # Get the best keyword for searching GIPHY
-    response_key = client.chat.completions.create(
-        messages=[
-            {"role": "system", "content": f"You are an expert in finding the keyword in a sentence. You will be given a sentence, and you must return the keyword. You should only respond with the word you select. Do not include anything else."},
-            {"role": "user", "content": matchedQuote}
-        ],
-        model="gpt-4o",
-    )
-    
-    keyword = response_key.choices[0].message.content
-    print(f"Keyword for GIPHY: {keyword}")
+index_path = "faiss_index"
 
-    # Return result along with GIF URL
-    return {
-        'Output': matchedQuote,
-        'gif_url': giphy_call(keyword)
-    }
-    
-if __name__ == "__main__":
-    # Run the Flask app
-    app.run(port=8000, debug=True)  # Changed port to 8000 to avoid possible conflicts
+os.makedirs(index_path, exist_ok=True)
+vector_store = FAISS.from_texts(meanings, OpenAIEmbeddings(), metadatas=testIndices)
+vector_store.save_local(index_path)
+print("Created and saved new FAISS index.")
+
+
+#quotes = vector_store.similarity_search(userInput, k=5)
